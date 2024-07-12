@@ -3,7 +3,7 @@
 interface IPixelRops{
     color: string
     index: number
-    resolution: number
+    sizePixel: number
     changeColorPixel: (index: number) => void
 }
 defineProps<IPixelRops>()
@@ -16,8 +16,8 @@ defineProps<IPixelRops>()
 
       :style="{
         backgroundColor: color, 
-        width: resolution + 'px', 
-        height: resolution + 'px'
+        width: sizePixel + 'px', 
+        height: sizePixel + 'px'
       }" 
 
       @click="changeColorPixel(index)"
@@ -26,6 +26,6 @@ defineProps<IPixelRops>()
 
 <style scoped>
     #pixel:hover{
-        background-color: rgb(0, 136, 255);
+      background-color: rgb(0, 136, 255);
     }
 </style>

@@ -1,24 +1,40 @@
 <script setup type="module" lang="ts">
 import Pixels from './components/Pixels.vue';
 import { onMounted, ref } from 'vue';
+  let width:number = 10;
+  let height:number = 10;
 
+  const TemplateArea = {width: width, height: height}
   let pixels: any = ref([]);
 
-  const resolution: number = 50;
-  const widthArea:number = 850;
+  let sizePixel = ref(30);
   let color: string = 'black';
+
+  const changeWidth = ref('0')
+  const changeHeight = ref('0')
 
   onMounted(() => {
     createSample()
   })
 
   function createSample(){
+    console.log('1')
     let colorPixel = false;
+    let count = 0
 
-    for(let i = 0; i <= (widthArea * widthArea) / (resolution * resolution) - 1; i++){
-      colorPixel = !colorPixel;
+    for(let i = 0; i <= Math.round(width * height - 1); i++){
+      if(width * height % 2 === 0 && count === width){
+        count = 0
+      }else{
+        colorPixel = !colorPixel
+      }
+
       pixels.value.push({color: colorPixel ? "#d6d6d6" : "#b5b5b5"});
+      count++
     }
+
+    TemplateArea.width = sizePixel.value * width
+    TemplateArea.height = sizePixel.value * height
   }
 
   function changeColorPixel(index: number){
@@ -37,14 +53,28 @@ import { onMounted, ref } from 'vue';
     createSample()
   }
 
+  function zoom(event: number){
+    if(event === -1){
+      sizePixel.value -= 15
+
+      if(sizePixel.value === 0) sizePixel.value = 1
+      
+    }else{
+      sizePixel.value += 15
+    }
+    
+    TemplateArea.width = sizePixel.value * width
+    TemplateArea.height = sizePixel.value * height
+  }
+
 </script>
 
 <template>
   <div class="main" >
     <div class="block-art">
       <div class="art" :style="{
-        width: widthArea + 'px',
-        height: widthArea + 'px',
+        width: TemplateArea.width + 'px',
+        height: TemplateArea.height + 'px',
       }">
   
         <Pixels 
@@ -52,8 +82,7 @@ import { onMounted, ref } from 'vue';
          :key="index" 
          :color="el.color" 
          :index="index"
-         :resolution="resolution"
-         :widthArea="widthArea"
+         :sizePixel="sizePixel"
          :changeColorPixel
         />
       </div>
@@ -61,20 +90,22 @@ import { onMounted, ref } from 'vue';
 
     <div class="block-edit">
       <div class="colors-block">
-        <div>
-          <input id="color" type="color" @change="chooseColor"/>
-          <h3>цвет</h3>
+        <input id="color" type="color" @change="chooseColor"/>
+      </div>
+      <div class="TemplateEdit">
+        <button id="clear" @click="clear">Очистить</button>
+
+        <div class="zoom">
+          <button @click="zoom(-1)">-</button>
+          <button @click="zoom(1)">+</button>
         </div>
       </div>
-  
-      <button id="clear" @click="clear">Очистить</button>
     </div>
 
   </div>
 </template>
 
 <style scoped lang="scss">
-
   .main{
     display: flex;
 
@@ -90,6 +121,8 @@ import { onMounted, ref } from 'vue';
       .art{
         display: flex;
         flex-wrap: wrap;
+        padding: 0;
+        margin: 0;
       }
     }
 
@@ -108,22 +141,35 @@ import { onMounted, ref } from 'vue';
     
         background-color: rgb(69, 69, 69);
 
-        div {
+        #color{
           position: relative;
-          top: 15px;
+          top: 20px;
 
-          h3 {
-            color: white;
-        
-            font-size: 15px;
-            font-weight: 300;
-          }
-          #color{
-            width: 150px;
-            height: 150px;
-        
-            border-radius: 100%;
-            border: 1px solid black
+          width: 150px;
+          height: 150px;
+      
+          border-radius: 100%;
+          border: 1px solid black
+        }
+      }
+
+
+      .TemplateEdit{
+        display: grid;
+        margin: 5px;
+
+        .zoom{
+          padding: 5px;
+          width: 100%;
+          display: flex;
+          justify-content: space-evenly;
+          align-items: center;
+          button{
+            width: 100%;
+            height: 100%;
+
+            border: none;
+            font-size: 20px;
           }
         }
       }
@@ -133,9 +179,12 @@ import { onMounted, ref } from 'vue';
     width: 100px;
     height: 40px;
 
+    padding: 10px;
+
     background-color: brown;
     color: white;
     border: none;
+    border-radius: 5px;
 
     transition: all 0.1s;
 
